@@ -162,7 +162,7 @@ body.hi-mode div.hi-text, body.hi-mode p.hi-text, body.hi-mode h1.hi-text, body.
 <span class="hi-text">फाइनल अंक<br>FINAL ANK</span>
 <Br><span id="header-date">Loading...</span></div>
 <div class="section-divider" style="text-transform: uppercase;font-size: 30px;padding:15px;width:300px;background: rgb(34,193,195);background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);color:black">
-<div id="header-final-ank">...</div>
+<div id="header-final-ank">K-1,M-4</div>
 </div>
 
 <div style="font-size: 16px;line-height: 20px;margin-top:50px;">
@@ -746,115 +746,5 @@ body.hi-mode div.hi-text, body.hi-mode p.hi-text, body.hi-mode h1.hi-text, body.
 </div>
 </div>
 
-<script>
-function setLang(lang) {
-let btnHi = document.getElementById('btn-hi');
-let btnEn = document.getElementById('btn-en');
-
-if(lang === 'hi') {
-document.body.classList.add('hi-mode');
-localStorage.setItem('prefLang', 'hi');
-btnHi.classList.add('active');
-btnEn.classList.remove('active');
-} else {
-document.body.classList.remove('hi-mode');
-localStorage.setItem('prefLang', 'en');
-btnEn.classList.add('active');
-btnHi.classList.remove('active');
-}
-}
-
-window.addEventListener('DOMContentLoaded', (event) => {
-let prefLang = localStorage.getItem('prefLang');
-if(prefLang === 'hi') {
-setLang('hi');
-}
-});
-
-async function fetchFirebaseData() {
-const p1 = "aHR0cHM6Ly9maW5hbGFuay1hYzcy";
-const p2 = "OS1kZWZhdWx0LXJ0ZGIuZmlyZWJh";
-const p3 = "c2Vpby5jb20vLmpzb24=";
-const url = atob(p1 + p2 + p3);
-
-try {
-const response = await fetch(url);
-const data = await response.json();
-
-if (data) {
-    if (data.global) {
-        document.getElementById('header-date').innerText = data.global.date;
-        document.getElementById('header-final-ank').innerText = data.global.finalAnkText;
-        document.getElementById('result-menu-date').innerText = `Date :- ${data.global.date}`;
-        document.getElementById('result-menu-final-ank').innerText = data.global.finalAnkText;
-    }
-
-    const updateGrid = (dataObj, prefix) => {
-        if(!dataObj || !dataObj.numbers) return;
-        const timeStr = dataObj.time ? ` | Time: ${dataObj.time}` : '';
-        document.getElementById(`${prefix}-datetime`).innerText = `Date: ${dataObj.date}${timeStr}`;
-        const boxes = document.querySelectorAll(`#${prefix} .jodi-box`);
-        dataObj.numbers.forEach((num, index) => {
-            if (boxes[index]) boxes[index].innerText = num;
-        });
-    };
-
-    updateGrid(data.openAnkKalyan, 'open-ank-kalyan');
-    updateGrid(data.openAnkMain, 'open-ank-main');
-    updateGrid(data.jodiTimeBazar, 'jodi-time-bazar');
-    updateGrid(data.jodiMilanDay, 'jodi-milan-day');
-    updateGrid(data.jodiRajdhaniDay, 'jodi-rajdhani-day');
-    updateGrid(data.jodiMadhuri, 'jodi-madhuri');
-
-    if (data.jodiKalyan) {
-        document.getElementById('jodi-kalyan-datetime').innerText = `Date: ${data.jodiKalyan.date} | Time: ${data.jodiKalyan.time}`;
-        const kalyanBoxes = document.querySelectorAll('#jodi-kalyan-container .jodi-box');
-        data.jodiKalyan.numbers.forEach((num, index) => {
-            if (kalyanBoxes[index]) kalyanBoxes[index].innerText = num;
-        });
-    }
-
-    if (data.jodiMainBazar) {
-        document.getElementById('jodi-main-datetime').innerText = `Date: ${data.jodiMainBazar.date} | Time: ${data.jodiMainBazar.time}`;
-        const mainBazarBoxes = document.querySelectorAll('#jodi-main-container .jodi-box');
-        data.jodiMainBazar.numbers.forEach((num, index) => {
-            if (mainBazarBoxes[index]) mainBazarBoxes[index].innerText = num;
-        });
-    }
-
-    if(data.passingRecord) {
-        document.getElementById('pass-rec-date').innerText = `Date: ${data.passingRecord.date}`;
-        const prMarkets = ['kalyan', 'mainBazar', 'timeBazar', 'milanDay', 'rajdhaniDay', 'madhuri'];
-        prMarkets.forEach(m => {
-            if(data.passingRecord[m]) {
-                document.getElementById(`pass-${m}-status`).innerText = data.passingRecord[m].status;
-                document.getElementById(`pass-${m}-num`).innerText = data.passingRecord[m].number;
-            }
-        });
-    }
-
-    if (data.markets) {
-        const marketIds = {
-            timeBazar: 'time-bazar', madhurDay: 'madhur-day', milanDay: 'milan-day',
-            rajdhaniDay: 'rajdhani-day', kalyan: 'kalyan', madhurNight: 'madhur-night',
-            milanNight: 'milan-night', rajdhaniNight: 'rajdhani-night', mainBazar: 'main-bazar'
-        };
-        for (const [key, idPrefix] of Object.entries(marketIds)) {
-            if (data.markets[key]) {
-                const numEl = document.getElementById(`${idPrefix}-num`);
-                const faEl = document.getElementById(`${idPrefix}-fa`);
-                if (numEl) numEl.innerText = data.markets[key].number;
-                if (faEl) faEl.innerText = data.markets[key].finalAnk;
-            }
-        }
-    }
-}
-} catch (error) {
-console.error(error);
-}
-}
-
-window.onload = fetchFirebaseData;
-</script>
 </body>
 </html>
